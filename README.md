@@ -12,4 +12,4 @@ For MSEA, use MSEA.sh and run_msea.R
 
 For SATURN, follow SATURN.docx
 
-Folling SATURN, use extract_macrogenes.py
+Following SATURN, use extract_macrogenes.py

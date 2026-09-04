@@ -11,3 +11,5 @@ For MDF, use mdprune and MDF.bash
 For MSEA, use MSEA.sh and run_msea.R
 
 For SATURN, follow SATURN.docx
+
+Folling SATURN, use extract_macrogenes.py

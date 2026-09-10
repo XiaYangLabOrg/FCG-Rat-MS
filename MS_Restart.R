@@ -5462,6 +5462,58 @@ term2gene <- impc_df %>%
   dplyr::select(mp_term_name, ENSEMBL) %>%
   distinct()
 
+# -------------------------------------------------------------------------
+# FULL IMPC OVERLAP TABLE
+# Includes SIGNIFICANT + INSIGNIFICANT phenotype overlaps
+# -------------------------------------------------------------------------
+
+# Get all IMPC phenotype terms
+impc_terms <- unique(term2gene$mp_term_name)
+
+# Calculate overlap for every CellType x Effect x IMPC phenotype
+full_overlap <- map2_dfr(
+  deg_split,
+  names(deg_split),
+  ~{
+    
+    df <- .x
+    group_name <- .y
+    
+    # Significant DEGs for this group
+    genes <- df %>%
+      filter(adj.P.Val < 0.05) %>%
+      pull(gene) %>%
+      unique()
+    
+    # Calculate overlap with EVERY IMPC phenotype
+    map_dfr(impc_terms, function(term) {
+      
+      impc_genes <- term2gene %>%
+        filter(mp_term_name == term) %>%
+        pull(ENSEMBL) %>%
+        unique()
+      
+      overlap_genes <- intersect(genes, impc_genes)
+      
+      tibble(
+        Group = group_name,
+        Description = term,
+        DEG_Count = length(genes),
+        IMPC_Gene_Count = length(impc_genes),
+        Overlap_Count = length(overlap_genes),
+        Overlap_Genes = paste(overlap_genes, collapse = "/")
+      )
+    })
+  }
+)
+
+# Save full overlap table
+write.csv(
+  full_overlap,
+  "/u/scratch/v/vturnbil/GSU_FCG/Restart/MS/IMPC/MS_IMPC_FULL_OVERLAP.csv",
+  row.names = FALSE
+)
+
 # run ORA analsis
 
 ora_by_group <- map(deg_split, function(df) {
